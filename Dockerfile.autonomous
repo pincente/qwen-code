@@ -65,6 +65,13 @@ WORKDIR /home/node/workspace
 COPY --chown=node:node scripts/telegram-bot.js /home/node/
 RUN chmod +x /home/node/telegram-bot.js
 
+# Copy autonomous agent startup script
+COPY --chown=node:node scripts/autonomous-startup.sh /home/node/
+RUN chmod +x /home/node/autonomous-startup.sh
+
+# Copy default settings
+COPY --chown=node:node scripts/default-autonomous-settings.json /home/node/.config/qwen-code/settings/default.json
+
 # Copy custom operating instructions
 COPY --chown=node:node QWEN.deploy.md /home/node/workspace/QWEN.md
 COPY --chown=node:node QWEN.deploy.md /home/node/QWEN.md
@@ -80,6 +87,10 @@ RUN chmod +x /home/node/test-autonomous-communication.sh
 # Copy customization script
 COPY --chown=node:node scripts/customize-instructions.sh /home/node/
 RUN chmod +x /home/node/customize-instructions.sh
+
+# Copy test OAuth script
+COPY --chown=node:node scripts/test-oauth-communication.sh /home/node/
+RUN chmod +x /home/node/test-oauth-communication.sh
 
 # Expose port for potential web interface
 EXPOSE 3000
