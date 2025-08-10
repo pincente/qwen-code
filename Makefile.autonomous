@@ -1,6 +1,6 @@
 # Makefile for Qwen Code Autonomous Agent
 
-.PHONY: build run stop logs test test-oauth customize clean help
+.PHONY: build run stop logs test test-oauth simulate customize clean help
 
 # Default target
 help:
@@ -13,6 +13,7 @@ help:
 	@echo "  make logs         View the autonomous agent logs"
 	@echo "  make test         Test the communication system"
 	@echo "  make test-oauth   Test the OAuth communication system"
+	@echo "  make simulate     Set up a simulation environment for testing"
 	@echo "  make customize    Customize the operating instructions"
 	@echo "  make clean        Remove the Docker image"
 	@echo "  make help         Show this help message"
@@ -57,6 +58,10 @@ test-oauth:
 # Remove the Docker image
 clean:
 	docker rmi qwen-code-autonomous || true
+
+# Set up a simulation environment for testing
+simulate:
+	/home/paul/qwen-code/scripts/simulate-agent.sh
 
 # Customize the operating instructions
 customize:
