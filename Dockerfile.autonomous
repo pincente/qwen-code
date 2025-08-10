@@ -43,6 +43,9 @@ ENV PATH=$PATH:/usr/local/share/npm-global/bin
 # Switch to non-root user node
 USER node
 
+# Install telegram bot dependency globally
+RUN npm install -g node-telegram-bot-api
+
 # Install qwen-code and clean up
 COPY packages/cli/dist/qwen-code-*.tgz /usr/local/share/npm-global/qwen-code.tgz
 COPY packages/core/dist/qwen-code-qwen-code-core-*.tgz /usr/local/share/npm-global/qwen-code-core.tgz
@@ -57,16 +60,6 @@ RUN mkdir -p /home/node/workspace \
 
 # Switch to workspace directory
 WORKDIR /home/node/workspace
-
-# Copy autonomous agent startup script
-COPY --chown=node:node scripts/autonomous-startup.sh /home/node/
-RUN chmod +x /home/node/autonomous-startup.sh
-
-# Copy default settings
-COPY --chown=node:node scripts/default-autonomous-settings.json /home/node/.config/qwen-code/settings/default.json
-
-# Install telegram bot dependency
-RUN npm install node-telegram-bot-api
 
 # Copy telegram bot script
 COPY --chown=node:node scripts/telegram-bot.js /home/node/
