@@ -49,7 +49,7 @@ For detailed setup instructions, see [Authorization](#authorization).
 
 Qwen Code can be deployed as an autonomous agent that works on a Git repository with minimal human intervention. When the agent requires input, it can notify you via Telegram.
 
-See [Autonomous Deployment README](./README.autonomous.md) for detailed instructions on setting up an autonomous Qwen Code agent.
+See [Autonomous Deployment README](./README.autonomous.md) for detailed instructions on setting up an autonomous Qwen Code agent, including how to test the OAuth implementation.
 
 ## Installation
 

@@ -114,12 +114,57 @@ Alternatively, you can use a pre-configured token by setting the `QWEN_OAUTH_TOK
    docker-compose -f docker-compose.autonomous.yml up -d
    ```
 
+## Testing the OAuth Implementation
+
+To test the OAuth implementation, you have two options:
+
+### Option 1: Using Docker (Recommended for full integration testing)
+
+1. Set up your environment variables:
+   ```bash
+   export REPO_URL=https://github.com/your-test-repo.git
+   export GEMINI_API_KEY=your-api-key  # Or QWEN_OAUTH_TOKEN for OAuth
+   export TELEGRAM_BOT_TOKEN=your-telegram-bot-token
+   ```
+
+2. Build and run the agent:
+   ```bash
+   make -f Makefile.autonomous build
+   make -f Makefile.autonomous run
+   ```
+
+3. Monitor the logs:
+   ```bash
+   make -f Makefile.autonomous logs
+   ```
+
+### Option 2: Local Simulation (For testing OAuth communication)
+
+1. Set up the simulation environment:
+   ```bash
+   make -f Makefile.autonomous simulate
+   ```
+
+2. Follow the instructions printed by the simulation script to test the OAuth communication system.
+
+## How to Test OAuth Authentication
+
+1. Create a Telegram bot with BotFather and obtain a token
+2. Set the `TELEGRAM_BOT_TOKEN` environment variable
+3. Start the Telegram bot
+4. When the agent requests OAuth authentication:
+   - Visit the provided URL
+   - Enter the user code
+   - Complete the authentication in your browser
+   - Return to Telegram and send "done" to confirm completion
+
 ## Environment Variables
 
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `REPO_URL` | Yes | URL of the Git repository for the agent to work on |
-| `GEMINI_API_KEY` | Yes | Your Qwen API key |
+| `GEMINI_API_KEY` | Yes* | Your Qwen API key (*required if not using OAuth) |
+| `QWEN_OAUTH_TOKEN` | Yes* | Pre-configured OAuth token (*required if not using API key) |
 | `TELEGRAM_BOT_TOKEN` | No | Telegram bot token for notifications |
 | `GIT_USER_NAME` | No | Git username for commits (defaults to "Qwen Code Agent") |
 | `GIT_USER_EMAIL` | No | Git email for commits (defaults to "qwen-code-agent@example.com") |
