@@ -103,10 +103,7 @@ setInterval(() => {
     try {
       const output = fs.readFileSync(agentOutputPath, 'utf8');
       if (output.trim()) {
-        notifyAllChats(`Agent output:
-```
-${output}
-````);
+        notifyAllChats(`Agent output:\n\`\`\`\n${output}\n\`\`\``);
         // Clear the output file
         fs.writeFileSync(agentOutputPath, '', 'utf8');
       }
