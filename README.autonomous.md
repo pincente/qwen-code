@@ -2,6 +2,20 @@
 
 This deployment package allows you to run Qwen Code as an autonomous agent that can work on a Git repository with minimal human intervention. When the agent requires input, it can notify you via Telegram.
 
+## Quick Start
+
+1. Create a `.env` file with your configuration:
+   ```bash
+   cp .env.example .env
+   # Edit .env with your actual values
+   ```
+
+2. Build and run the agent:
+   ```bash
+   make -f Makefile.autonomous build
+   make -f Makefile.autonomous run
+   ```
+
 ## Features
 
 - Clones a user-specified Git repository on startup
@@ -157,6 +171,23 @@ To test the OAuth implementation, you have two options:
    - Enter the user code
    - Complete the authentication in your browser
    - Return to Telegram and send "done" to confirm completion
+
+## Environment Configuration
+
+The autonomous agent uses a `.env` file for configuration. Create your `.env` file by copying the example:
+
+```bash
+cp .env.example .env
+```
+
+Then edit the `.env` file with your actual values:
+
+- `REPO_URL`: The Git repository URL for the agent to work on (required)
+- `GEMINI_API_KEY`: Your Qwen API key (required unless using OAuth token)
+- `QWEN_OAUTH_TOKEN`: Pre-configured OAuth token (required unless using API key)
+- `TELEGRAM_BOT_TOKEN`: Telegram bot token for notifications (optional)
+- `GIT_USER_NAME`: Git username for commits (optional)
+- `GIT_USER_EMAIL`: Git email for commits (optional)
 
 ## Environment Variables
 

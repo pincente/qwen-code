@@ -6,19 +6,12 @@ services:
       context: .
       dockerfile: Dockerfile.autonomous
     image: qwen-code-autonomous:latest
+    env_file:
+      - .env
     environment:
-      # Required - URL of the repository to clone
-      - REPO_URL=
-      
-      # Optional - Git user configuration
+      # Optional - Git user configuration (can be overridden in .env file)
       - GIT_USER_NAME=Qwen Code Agent
       - GIT_USER_EMAIL=qwen-code-agent@example.com
-      
-      # Optional - API keys
-      - GEMINI_API_KEY=
-      
-      # Optional - Telegram bot token for notifications
-      - TELEGRAM_BOT_TOKEN=
       
       # Sandbox configuration
       - GEMINI_SANDBOX=true
