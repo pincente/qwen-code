@@ -1,0 +1,8 @@
+{
+  "approvalMode": "autoEdit",
+  "telemetry": {
+    "enabled": false
+  },
+  "checkpointing": true,
+  "sandbox": true
+}

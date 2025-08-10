@@ -1,0 +1,64 @@
+# Makefile for Qwen Code Autonomous Agent
+
+.PHONY: build run stop logs test clean customize help
+
+# Default target
+help:
+	@echo "Qwen Code Autonomous Agent Makefile"
+	@echo ""
+	@echo "Usage:"
+	@echo "  make build        Build the autonomous agent Docker image"
+	@echo "  make run          Run the autonomous agent"
+	@echo "  make stop         Stop the autonomous agent"
+	@echo "  make logs         View the autonomous agent logs"
+	@echo "  make test         Test the communication system"
+	@echo "  make customize    Customize the operating instructions"
+	@echo "  make clean        Remove the Docker image"
+	@echo "  make help         Show this help message"
+	@echo ""
+	@echo "Before running, make sure to:"
+	@echo "1. Set the REPO_URL environment variable"
+	@echo "2. Set the GEMINI_API_KEY environment variable"
+	@echo "3. (Optional) Set the TELEGRAM_BOT_TOKEN environment variable"
+
+# Build the Docker image
+build:
+	docker build -f Dockerfile.autonomous -t qwen-code-autonomous .
+
+# Run the autonomous agent
+run:
+	@if [ -z "$(REPO_URL)" ]; then \
+		echo "ERROR: REPO_URL environment variable is required"; \
+		exit 1; \
+	fi
+	@if [ -z "$(GEMINI_API_KEY)" ]; then \
+		echo "ERROR: GEMINI_API_KEY environment variable is required"; \
+		exit 1; \
+	fi
+	docker-compose -f docker-compose.autonomous.yml up -d
+
+# Stop the autonomous agent
+stop:
+	docker-compose -f docker-compose.autonomous.yml down
+
+# View logs
+logs:
+	docker-compose -f docker-compose.autonomous.yml logs -f
+
+# Test the communication system
+test:
+	docker-compose -f docker-compose.autonomous.yml exec qwen-code-autonomous /home/node/test-autonomous-communication.sh
+
+# Remove the Docker image
+clean:
+	docker rmi qwen-code-autonomous || true
+
+# Customize the operating instructions
+customize:
+	./scripts/customize-instructions.sh
+
+# Quick setup for development
+dev-setup:
+	@echo "Setting up development environment..."
+	npm install node-telegram-bot-api
+	@echo "Development environment setup complete."

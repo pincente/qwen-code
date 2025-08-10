@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  qwen-code-autonomous:
+    build:
+      context: .
+      dockerfile: Dockerfile.autonomous
+    image: qwen-code-autonomous:latest
+    environment:
+      # Required - URL of the repository to clone
+      - REPO_URL=
+      
+      # Optional - Git user configuration
+      - GIT_USER_NAME=Qwen Code Agent
+      - GIT_USER_EMAIL=qwen-code-agent@example.com
+      
+      # Optional - API keys
+      - GEMINI_API_KEY=
+      
+      # Optional - Telegram bot token for notifications
+      - TELEGRAM_BOT_TOKEN=
+      
+      # Sandbox configuration
+      - GEMINI_SANDBOX=true
+      
+    volumes:
+      # Mount for persistent data
+      - qwen-code-data:/home/node/.config/qwen-code
+      
+      # Optional - Mount for Docker socket if agent needs to run Docker commands
+      # - /var/run/docker.sock:/var/run/docker.sock
+      
+    # Expose ports if needed for web interface
+    # ports:
+    #   - "3000:3000"
+      
+    # Restart policy
+    restart: unless-stopped
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "node", "-e", "console.log('Health check passed')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  qwen-code-data:

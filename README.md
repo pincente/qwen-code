@@ -11,7 +11,7 @@
 
 **AI-powered command-line workflow tool for developers**
 
-[Installation](#installation) • [Quick Start](#quick-start) • [Features](#key-features) • [Documentation](./docs/) • [Contributing](./CONTRIBUTING.md)
+[Installation](#installation) • [Quick Start](#quick-start) • [Features](#key-features) • [Documentation](./docs/) • [Contributing](./CONTRIBUTING.md) • [Autonomous Deployment](#autonomous-deployment)
 
 </div>
 
@@ -44,6 +44,12 @@ For detailed setup instructions, see [Authorization](#authorization).
 - **Code Understanding & Editing** - Query and edit large codebases beyond traditional context window limits
 - **Workflow Automation** - Automate operational tasks like handling pull requests and complex rebases
 - **Enhanced Parser** - Adapted parser specifically optimized for Qwen-Coder models
+
+## Autonomous Deployment
+
+Qwen Code can be deployed as an autonomous agent that works on a Git repository with minimal human intervention. When the agent requires input, it can notify you via Telegram.
+
+See [Autonomous Deployment README](./README.autonomous.md) for detailed instructions on setting up an autonomous Qwen Code agent.
 
 ## Installation
 

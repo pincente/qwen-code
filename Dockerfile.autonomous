@@ -1,0 +1,97 @@
+# Start with the existing Qwen Code sandbox as base
+FROM docker.io/library/node:20-slim
+
+# Build arguments
+ARG SANDBOX_NAME="qwen-code-autonomous"
+ARG CLI_VERSION_ARG
+ENV SANDBOX="$SANDBOX_NAME"
+ENV CLI_VERSION=$CLI_VERSION_ARG
+
+# Install minimal set of packages, then clean up
+RUN apt-get update && apt-get install -y --no-install-recommends \
+  python3 \
+  make \
+  g++ \
+  man-db \
+  curl \
+  dnsutils \
+  less \
+  jq \
+  bc \
+  gh \
+  git \
+  unzip \
+  rsync \
+  ripgrep \
+  procps \
+  psmisc \
+  lsof \
+  socat \
+  ca-certificates \
+  # Additional packages for autonomous operation
+  openssh-client \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
+
+# Set up npm global package folder under /usr/local/share
+# Give it to non-root user node, already set up in base image
+RUN mkdir -p /usr/local/share/npm-global \
+  && chown -R node:node /usr/local/share/npm-global
+ENV NPM_CONFIG_PREFIX=/usr/local/share/npm-global
+ENV PATH=$PATH:/usr/local/share/npm-global/bin
+
+# Switch to non-root user node
+USER node
+
+# Install qwen-code and clean up
+COPY packages/cli/dist/qwen-code-*.tgz /usr/local/share/npm-global/qwen-code.tgz
+COPY packages/core/dist/qwen-code-qwen-code-core-*.tgz /usr/local/share/npm-global/qwen-code-core.tgz
+RUN npm install -g /usr/local/share/npm-global/qwen-code.tgz /usr/local/share/npm-global/qwen-code-core.tgz \
+  && npm cache clean --force \
+  && rm -f /usr/local/share/npm-global/qwen-{code,code-core}.tgz
+
+# Create directories for the autonomous agent
+RUN mkdir -p /home/node/workspace \
+  && mkdir -p /home/node/.config/qwen-code \
+  && mkdir -p /home/node/.config/qwen-code/settings
+
+# Switch to workspace directory
+WORKDIR /home/node/workspace
+
+# Copy autonomous agent startup script
+COPY --chown=node:node scripts/autonomous-startup.sh /home/node/
+RUN chmod +x /home/node/autonomous-startup.sh
+
+# Copy default settings
+COPY --chown=node:node scripts/default-autonomous-settings.json /home/node/.config/qwen-code/settings/default.json
+
+# Install telegram bot dependency
+RUN npm install node-telegram-bot-api
+
+# Copy telegram bot script
+COPY --chown=node:node scripts/telegram-bot.js /home/node/
+RUN chmod +x /home/node/telegram-bot.js
+
+# Copy custom operating instructions
+COPY --chown=node:node QWEN.deploy.md /home/node/workspace/QWEN.md
+
+# Copy health check script
+COPY --chown=node:node scripts/healthcheck.sh /home/node/
+RUN chmod +x /home/node/healthcheck.sh
+
+# Copy test script
+COPY --chown=node:node scripts/test-autonomous-communication.sh /home/node/
+RUN chmod +x /home/node/test-autonomous-communication.sh
+
+# Copy customization script
+COPY --chown=node:node scripts/customize-instructions.sh /home/node/
+RUN chmod +x /home/node/customize-instructions.sh
+
+# Expose port for potential web interface
+EXPOSE 3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 CMD /home/node/healthcheck.sh
+
+# Entry point - runs the autonomous startup script
+ENTRYPOINT ["/home/node/autonomous-startup.sh"]

@@ -1,0 +1,77 @@
+#!/bin/bash
+
+# autonomous-startup.sh - Startup script for autonomous Qwen Code instance
+
+set -e
+
+echo "Starting Qwen Code autonomous agent..."
+
+# Create .qwen directory for communication with Telegram bot
+mkdir -p /home/node/workspace/.qwen
+
+# Check if repository URL is provided
+if [ -z "$REPO_URL" ]; then
+  echo "ERROR: REPO_URL environment variable is required"
+  exit 1
+fi
+
+# Clone the repository if directory is empty
+if [ -z "$(ls -A /home/node/workspace)" ] || [ ! -d "/home/node/workspace/.git" ]; then
+  echo "Cloning repository: $REPO_URL"
+  rm -rf /home/node/workspace/* /home/node/workspace/.* 2>/dev/null || true
+  git clone "$REPO_URL" /home/node/workspace
+else
+  echo "Repository already exists in workspace"
+fi
+
+# Set up git identity if provided
+if [ -n "$GIT_USER_NAME" ] && [ -n "$GIT_USER_EMAIL" ]; then
+  git config --global user.name "$GIT_USER_NAME"
+  git config --global user.email "$GIT_USER_EMAIL"
+fi
+
+# Configure Qwen Code for autonomous mode
+echo "Configuring Qwen Code for autonomous mode..."
+
+# Set up API keys if provided
+if [ -n "$GEMINI_API_KEY" ]; then
+  echo "Setting up Qwen Code with Qwen API key"
+  # The API key will be available in the environment
+fi
+
+# Start Telegram bot in background if token is provided
+if [ -n "$TELEGRAM_BOT_TOKEN" ]; then
+  echo "Starting Telegram bot..."
+  node /home/node/telegram-bot.js &
+  echo "Telegram bot started"
+  
+  # Notify that the agent is starting up
+  echo "Qwen Code autonomous agent is starting up..." > /home/node/workspace/.qwen/agent_output.txt
+fi
+
+# Change to workspace directory
+cd /home/node/workspace
+
+# Ensure QWEN.md is in place for the agent's custom instructions
+if [ ! -f "QWEN.md" ]; then
+  # Copy from the deployed file if it doesn't exist
+  if [ -f "/home/node/workspace/QWEN.md" ]; then
+    echo "Copying QWEN.md to workspace"
+    cp /home/node/workspace/QWEN.md QWEN.md
+  else
+    echo "Warning: QWEN.md not found"
+  fi
+else
+  echo "QWEN.md already exists in workspace"
+fi
+
+# Show the agent its instructions
+echo "Agent instructions:"
+echo "=================="
+head -10 QWEN.md
+echo "..."
+echo ""
+
+# Start Qwen Code in non-interactive mode
+echo "Starting Qwen Code in autonomous mode..."
+exec qwen --non-interactive
