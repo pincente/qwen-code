@@ -34,15 +34,13 @@ run:
 		echo "See .env.example for an example configuration."; \
 		exit 1; \
 	fi
-	@if ! grep -q "REPO_URL=" .env || [ -z "$(grep REPO_URL= .env | cut -d '=' -f 2)" ]; then \
+	@if [ -z "$$(grep '^REPO_URL=' .env | cut -d '=' -f 2-)" ]; then \
 		echo "ERROR: REPO_URL is not set in .env file"; \
 		exit 1; \
 	fi
-	@if ! grep -q "GEMINI_API_KEY=" .env || [ -z "$(grep GEMINI_API_KEY= .env | cut -d '=' -f 2)" ]; then \
-		if ! grep -q "QWEN_OAUTH_TOKEN=" .env || [ -z "$(grep QWEN_OAUTH_TOKEN= .env | cut -d '=' -f 2)" ]; then \
-			echo "ERROR: Either GEMINI_API_KEY or QWEN_OAUTH_TOKEN must be set in .env file"; \
-			exit 1; \
-		fi \
+	@if [ -z "$$(grep '^GEMINI_API_KEY=' .env | cut -d '=' -f 2-)" ] && [ -z "$$(grep '^QWEN_OAUTH_TOKEN=' .env | cut -d '=' -f 2-)" ]; then \
+		echo "ERROR: Either GEMINI_API_KEY or QWEN_OAUTH_TOKEN must be set in .env file"; \
+		exit 1; \
 	fi
 	docker compose -f docker-compose.autonomous.yml up -d
 
