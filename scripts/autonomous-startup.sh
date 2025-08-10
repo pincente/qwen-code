@@ -93,4 +93,4 @@ fi
 
 # Start Qwen Code in autonomous mode
 echo "Starting Qwen Code in autonomous mode..."
-exec qwen --prompt ""
+exec qwen --prompt "You are an autonomous agent working on the repository in the current directory. Review the codebase and identify tasks that need to be completed. Follow the instructions in QWEN.md. Only request human input when absolutely necessary."
