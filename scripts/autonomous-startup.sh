@@ -91,6 +91,6 @@ else
   echo "Note: For OAuth authentication, you'll need to respond to Telegram messages with 'done' after completing the browser authentication."
 fi
 
-# Start Qwen Code in non-interactive mode
+# Start Qwen Code in autonomous mode
 echo "Starting Qwen Code in autonomous mode..."
-exec qwen --non-interactive
+exec qwen --prompt ""
