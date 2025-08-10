@@ -39,12 +39,16 @@ RUN mkdir -p /usr/local/share/npm-global \
   && chown -R node:node /usr/local/share/npm-global
 ENV NPM_CONFIG_PREFIX=/usr/local/share/npm-global
 ENV PATH=$PATH:/usr/local/share/npm-global/bin
+ENV NODE_PATH=/usr/local/share/npm-global/lib/node_modules
 
 # Switch to non-root user node
 USER node
 
 # Install telegram bot dependency globally
 RUN npm install -g node-telegram-bot-api
+
+# Also install it locally in the home directory to ensure it's found
+RUN mkdir -p /home/node/node_modules && npm install --prefix /home/node node-telegram-bot-api
 
 # Install qwen-code and clean up
 COPY packages/cli/dist/qwen-code-*.tgz /usr/local/share/npm-global/qwen-code.tgz
