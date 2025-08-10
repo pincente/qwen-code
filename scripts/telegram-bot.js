@@ -29,6 +29,8 @@ if (!fs.existsSync(qwenDir)) {
 const userInputPath = path.join(qwenDir, 'user_input.txt');
 const agentOutputPath = path.join(qwenDir, 'agent_output.txt');
 const agentInputRequestPath = path.join(qwenDir, 'input_request.txt');
+const oauthRequestPath = path.join(qwenDir, 'oauth_request.txt');
+const oauthResponsePath = path.join(qwenDir, 'oauth_response.txt');
 
 console.log('Telegram bot started');
 
@@ -48,6 +50,30 @@ bot.on('message', (msg) => {
   if (msg.text === '/status') {
     bot.sendMessage(chatId, 'Qwen Code autonomous agent is running.');
     return;
+  }
+  
+  // Check if we're waiting for OAuth response
+  if (fs.existsSync(oauthRequestPath)) {
+    // If the message is "done" or "completed", assume OAuth is complete
+    if (msg.text.toLowerCase() === 'done' || msg.text.toLowerCase() === 'completed') {
+      // Write OAuth completion response
+      const oauthResponse = {
+        status: 'completed',
+        message: 'User confirmed OAuth completion'
+      };
+      fs.writeFileSync(oauthResponsePath, JSON.stringify(oauthResponse), 'utf8');
+      
+      // Remove OAuth request file
+      if (fs.existsSync(oauthRequestPath)) {
+        fs.unlinkSync(oauthRequestPath);
+      }
+      
+      bot.sendMessage(chatId, 'Thank you! I will check if the OAuth authentication was successful.');
+      return;
+    } else {
+      bot.sendMessage(chatId, 'I am currently waiting for OAuth authentication. Please complete the authentication process and reply with "done" when finished.');
+      return;
+    }
   }
   
   // Save user input for Qwen Code
@@ -77,7 +103,10 @@ setInterval(() => {
     try {
       const output = fs.readFileSync(agentOutputPath, 'utf8');
       if (output.trim()) {
-        notifyAllChats(`Agent output:\n\`\`\`\n${output}\n\`\`\``);
+        notifyAllChats(`Agent output:
+```
+${output}
+````);
         // Clear the output file
         fs.writeFileSync(agentOutputPath, '', 'utf8');
       }
@@ -91,10 +120,30 @@ setInterval(() => {
     try {
       const request = fs.readFileSync(agentInputRequestPath, 'utf8');
       if (request.trim()) {
-        notifyAllChats(`The agent needs your input:\n\n${request}`);
+        notifyAllChats(`The agent needs your input:
+
+${request}`);
       }
     } catch (err) {
       console.error('Error reading input request:', err);
+    }
+  }
+  
+  // Check for OAuth requests
+  if (fs.existsSync(oauthRequestPath)) {
+    try {
+      const requestContent = fs.readFileSync(oauthRequestPath, 'utf8');
+      if (requestContent.trim()) {
+        const oauthRequest = JSON.parse(requestContent);
+        const message = `🔐 Qwen OAuth Authentication Required
+
+${oauthRequest.message}
+
+Please complete the authentication and reply with "done" when finished.`;
+        notifyAllChats(message);
+      }
+    } catch (err) {
+      console.error('Error reading OAuth request:', err);
     }
   }
 }, 5000); // Check every 5 seconds

@@ -37,6 +37,11 @@ echo "Configuring Qwen Code for autonomous mode..."
 if [ -n "$GEMINI_API_KEY" ]; then
   echo "Setting up Qwen Code with Qwen API key"
   # The API key will be available in the environment
+elif [ -n "$QWEN_OAUTH_TOKEN" ]; then
+  echo "Setting up Qwen Code with pre-configured OAuth token"
+  # The OAuth token will be available in the environment
+else
+  echo "No API key or OAuth token provided. Will use interactive OAuth flow if needed."
 fi
 
 # Start Telegram bot in background if token is provided
@@ -71,6 +76,16 @@ echo "=================="
 head -10 QWEN.md
 echo "..."
 echo ""
+
+# Show authentication information
+if [ -n "$GEMINI_API_KEY" ]; then
+  echo "Authentication: Using Qwen API key"
+elif [ -n "$QWEN_OAUTH_TOKEN" ]; then
+  echo "Authentication: Using pre-configured OAuth token"
+else
+  echo "Authentication: Will use interactive OAuth flow when needed"
+  echo "Note: For OAuth authentication, you'll need to respond to Telegram messages with 'done' after completing the browser authentication."
+fi
 
 # Start Qwen Code in non-interactive mode
 echo "Starting Qwen Code in autonomous mode..."

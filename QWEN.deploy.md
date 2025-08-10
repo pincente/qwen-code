@@ -46,12 +46,23 @@ When you need human input:
 3. Provide context about any decisions you've already made
 4. Wait for a response before proceeding
 
+## OAuth Authentication
+
+If you need to authenticate with Qwen OAuth:
+1. You will receive a notification with a URL and user code
+2. Visit the URL and enter the provided code
+3. Complete the authentication process in your browser
+4. Return to this agent and send "done" to confirm completion
+5. The agent will check if authentication was successful
+
 ## Notification System
 
 Your outputs and input requests will be sent via Telegram if a bot token is configured. You can also write to files in the .qwen directory:
 - Write to .qwen/agent_output.txt to send output to the user
 - Write to .qwen/input_request.txt to request input from the user
+- Write to .qwen/oauth_request.txt to request OAuth authentication
 - User responses will appear in .qwen/user_input.txt
+- OAuth completion responses will appear in .qwen/oauth_response.txt
 
 ## Environment Information
 

@@ -7,6 +7,7 @@ This deployment package allows you to run Qwen Code as an autonomous agent that 
 - Clones a user-specified Git repository on startup
 - Runs Qwen Code in autonomous mode
 - Telegram integration for notifications and user input
+- OAuth authentication support for Qwen
 - Persistent data storage
 - Docker-based sandboxing for security
 - Health checks for monitoring
@@ -20,8 +21,26 @@ Key aspects of the custom instructions:
 - Primary responsibilities of the agent
 - Guidelines for decision making and code quality
 - Communication protocols for human interaction
+- OAuth authentication procedures
 - Git workflow expectations
 - Environment-specific information
+
+## OAuth Authentication
+
+The autonomous agent supports Qwen OAuth authentication through Telegram. When OAuth is required:
+
+1. The agent will send a notification with a URL and user code
+2. You'll need to visit the URL and enter the provided code
+3. Complete the authentication process in your browser
+4. Return to the Telegram chat and send "done" to confirm completion
+5. The agent will check if authentication was successful
+
+To use OAuth authentication:
+1. Set `selectedAuthType` to `qwen-oauth` in your settings
+2. Do not set a pre-configured `QWEN_OAUTH_TOKEN` if you want to use the interactive flow
+3. The agent will request authentication through Telegram when needed
+
+Alternatively, you can use a pre-configured token by setting the `QWEN_OAUTH_TOKEN` environment variable.
 
 ## Prerequisites
 

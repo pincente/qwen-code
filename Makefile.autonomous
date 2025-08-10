@@ -1,6 +1,6 @@
 # Makefile for Qwen Code Autonomous Agent
 
-.PHONY: build run stop logs test clean customize help
+.PHONY: build run stop logs test test-oauth customize clean help
 
 # Default target
 help:
@@ -12,6 +12,7 @@ help:
 	@echo "  make stop         Stop the autonomous agent"
 	@echo "  make logs         View the autonomous agent logs"
 	@echo "  make test         Test the communication system"
+	@echo "  make test-oauth   Test the OAuth communication system"
 	@echo "  make customize    Customize the operating instructions"
 	@echo "  make clean        Remove the Docker image"
 	@echo "  make help         Show this help message"
@@ -48,6 +49,10 @@ logs:
 # Test the communication system
 test:
 	docker-compose -f docker-compose.autonomous.yml exec qwen-code-autonomous /home/node/test-autonomous-communication.sh
+
+# Test the OAuth communication system
+test-oauth:
+	docker-compose -f docker-compose.autonomous.yml exec qwen-code-autonomous /home/node/test-oauth-communication.sh
 
 # Remove the Docker image
 clean:
