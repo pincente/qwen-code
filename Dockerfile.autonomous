@@ -74,6 +74,7 @@ RUN chmod +x /home/node/telegram-bot.js
 
 # Copy custom operating instructions
 COPY --chown=node:node QWEN.deploy.md /home/node/workspace/QWEN.md
+COPY --chown=node:node QWEN.deploy.md /home/node/QWEN.md
 
 # Copy health check script
 COPY --chown=node:node scripts/healthcheck.sh /home/node/

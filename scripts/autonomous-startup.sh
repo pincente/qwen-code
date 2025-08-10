@@ -6,9 +6,6 @@ set -e
 
 echo "Starting Qwen Code autonomous agent..."
 
-# Create .qwen directory for communication with Telegram bot
-mkdir -p /home/node/workspace/.qwen
-
 # Check if repository URL is provided
 if [ -z "$REPO_URL" ]; then
   echo "ERROR: REPO_URL environment variable is required"
@@ -44,6 +41,9 @@ else
   echo "No API key or OAuth token provided. Will use interactive OAuth flow if needed."
 fi
 
+# Create .qwen directory for communication with Telegram bot
+mkdir -p /home/node/workspace/.qwen
+
 # Start Telegram bot in background if token is provided
 if [ -n "$TELEGRAM_BOT_TOKEN" ]; then
   echo "Starting Telegram bot..."
@@ -59,10 +59,10 @@ cd /home/node/workspace
 
 # Ensure QWEN.md is in place for the agent's custom instructions
 if [ ! -f "QWEN.md" ]; then
-  # Copy from the deployed file if it doesn't exist
-  if [ -f "/home/node/workspace/QWEN.md" ]; then
+  # Copy from the default location if it doesn't exist
+  if [ -f "/home/node/QWEN.md" ]; then
     echo "Copying QWEN.md to workspace"
-    cp /home/node/workspace/QWEN.md QWEN.md
+    cp /home/node/QWEN.md QWEN.md
   else
     echo "Warning: QWEN.md not found"
   fi
@@ -73,8 +73,12 @@ fi
 # Show the agent its instructions
 echo "Agent instructions:"
 echo "=================="
-head -10 QWEN.md
-echo "..."
+if [ -f "QWEN.md" ]; then
+  head -10 QWEN.md
+  echo "..."
+else
+  echo "No QWEN.md file found"
+fi
 echo ""
 
 # Show authentication information
