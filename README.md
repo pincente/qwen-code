@@ -83,6 +83,22 @@ qwen
 > Generate unit tests for this module
 ```
 
+### Telegram Integration
+
+Qwen Code supports switching conversations to Telegram for a more flexible interaction model:
+
+1. Configure your Telegram bot token in `.qwen/settings.json`:
+   ```json
+   {
+     "telegram": {
+       "botToken": "YOUR_BOT_TOKEN_HERE",
+       "enabled": true
+     }
+   }
+   ```
+2. Run Qwen Code and type `/tg` to switch to Telegram mode
+3. Follow the instructions to connect via Telegram
+
 ### Session Management
 
 Control your token usage with configurable session limits to optimize costs and performance.
@@ -311,6 +327,7 @@ qwen
 - `/clear` - Clear conversation history
 - `/compress` - Compress history to save tokens
 - `/status` - Show current session information
+- `/tg` - Switch conversation to Telegram
 - `/exit` or `/quit` - Exit Qwen Code
 
 ### Keyboard Shortcuts

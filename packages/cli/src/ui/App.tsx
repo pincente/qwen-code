@@ -16,6 +16,7 @@ import {
   useInput,
   type Key as InkKeyType,
 } from 'ink';
+import { TelegramIntegration } from '../telegram/telegramIntegration.js';
 import { StreamingState, type HistoryItem, MessageType } from './types.js';
 import { useTerminalSize } from './hooks/useTerminalSize.js';
 import { useGeminiStream } from './hooks/useGeminiStream.js';
@@ -175,6 +176,8 @@ const App = ({ config, settings, startupWarnings = [], version }: AppProps) => {
     IdeContext | undefined
   >();
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [telegramMode, setTelegramMode] = useState<boolean>(false);
+  const telegramIntegrationRef = useRef<TelegramIntegration | null>(null);
 
   useEffect(() => {
     const unsubscribe = ideContext.subscribeToIdeContext(setIdeContextState);
@@ -490,6 +493,8 @@ const App = ({ config, settings, startupWarnings = [], version }: AppProps) => {
     toggleVimEnabled,
   } = useVimMode();
 
+  // Override the command context with Telegram functions
+
   const {
     handleSlashCommand,
     slashCommands,
@@ -513,6 +518,18 @@ const App = ({ config, settings, startupWarnings = [], version }: AppProps) => {
     toggleVimEnabled,
     setIsProcessing,
   );
+
+  // Override the command context with Telegram functions
+  const commandContextWithTelegram = {
+    ...commandContext,
+    ui: {
+      ...commandContext.ui,
+      setTelegramMode,
+      setTelegramIntegration: (integration: TelegramIntegration) => {
+        telegramIntegrationRef.current = integration;
+      },
+    },
+  };
 
   const {
     streamingState,
@@ -540,10 +557,16 @@ const App = ({ config, settings, startupWarnings = [], version }: AppProps) => {
     (submittedValue: string) => {
       const trimmedValue = submittedValue.trim();
       if (trimmedValue.length > 0) {
-        submitQuery(trimmedValue);
+        submitQuery(trimmedValue).finally(() => {
+          // Reset processing state after query submission is complete
+          setIsProcessing(false);
+        });
+      } else {
+        // Reset processing state even if there's no value to submit
+        setIsProcessing(false);
       }
     },
-    [submitQuery],
+    [submitQuery, setIsProcessing],
   );
 
   const buffer = useTextBuffer({
@@ -742,6 +765,54 @@ const App = ({ config, settings, startupWarnings = [], version }: AppProps) => {
 
   const initialPrompt = useMemo(() => config.getQuestion(), [config]);
   const geminiClient = config.getGeminiClient();
+
+  // Poll for Telegram messages
+  useEffect(() => {
+    if (!telegramMode || !telegramIntegrationRef.current) {
+      return;
+    }
+
+    let pollTimeout: NodeJS.Timeout | null = null;
+
+    const pollMessages = () => {
+      try {
+        const telegramIntegration =
+          telegramIntegrationRef.current as TelegramIntegration;
+        if (telegramIntegration.hasMessages()) {
+          const message = telegramIntegration.getNextMessage();
+          if (message) {
+            // Process the Telegram message
+            console.log('Processing Telegram message:', message.text);
+            // Set processing state to disable input while handling Telegram message
+            setIsProcessing(true);
+            handleFinalSubmit(message.text);
+          }
+        }
+      } catch (error) {
+        console.error('Error polling Telegram messages:', error);
+      } finally {
+        // Schedule next poll with error handling
+        try {
+          pollTimeout = setTimeout(pollMessages, 1000);
+        } catch (error) {
+          console.error('Error scheduling next Telegram poll:', error);
+        }
+      }
+    };
+
+    // Start polling
+    try {
+      pollTimeout = setTimeout(pollMessages, 1000);
+    } catch (error) {
+      console.error('Error starting Telegram polling:', error);
+    }
+
+    return () => {
+      if (pollTimeout) {
+        clearTimeout(pollTimeout);
+      }
+    };
+  }, [telegramMode, handleFinalSubmit, setIsProcessing]);
 
   useEffect(() => {
     if (
@@ -1049,7 +1120,7 @@ const App = ({ config, settings, startupWarnings = [], version }: AppProps) => {
                 </OverflowProvider>
               )}
 
-              {isInputActive && (
+              {isInputActive && !telegramMode && (
                 <InputPrompt
                   buffer={buffer}
                   inputWidth={inputWidth}
@@ -1059,13 +1130,21 @@ const App = ({ config, settings, startupWarnings = [], version }: AppProps) => {
                   onClearScreen={handleClearScreen}
                   config={config}
                   slashCommands={slashCommands}
-                  commandContext={commandContext}
+                  commandContext={commandContextWithTelegram}
                   shellModeActive={shellModeActive}
                   setShellModeActive={setShellModeActive}
                   focus={isFocused}
                   vimHandleInput={vimHandleInput}
                   placeholder={placeholder}
                 />
+              )}
+              {telegramMode && (
+                <Box marginTop={1}>
+                  <Text color={Colors.AccentYellow}>
+                    📱 Telegram mode active. Send messages from your Telegram
+                    bot to continue the conversation.
+                  </Text>
+                </Box>
               )}
             </>
           )}

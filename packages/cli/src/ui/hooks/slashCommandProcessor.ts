@@ -163,6 +163,8 @@ export const useSlashCommandProcessor = (
         setPendingItem: setPendingCompressionItem,
         toggleCorgiMode,
         toggleVimEnabled,
+        setTelegramMode: () => {}, // Will be overridden in App.tsx
+        setTelegramIntegration: () => {}, // Will be overridden in App.tsx
       },
       session: {
         stats: session.stats,

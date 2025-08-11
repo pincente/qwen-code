@@ -11,6 +11,7 @@ import { LoadedSettings } from '../../config/settings.js';
 import { UseHistoryManagerReturn } from '../hooks/useHistoryManager.js';
 import type { HistoryItem } from '../types.js';
 import { SessionStatsState } from '../contexts/SessionContext.js';
+import { TelegramIntegration } from '../../telegram/telegramIntegration.js';
 
 // Grouped dependencies for clarity and easier mocking
 export interface CommandContext {
@@ -59,6 +60,10 @@ export interface CommandContext {
     /** Toggles a special display mode. */
     toggleCorgiMode: () => void;
     toggleVimEnabled: () => Promise<boolean>;
+    /** Sets Telegram mode */
+    setTelegramMode?: (mode: boolean) => void;
+    /** Sets Telegram integration instance */
+    setTelegramIntegration?: (integration: TelegramIntegration) => void;
   };
   // Session-specific data
   session: {

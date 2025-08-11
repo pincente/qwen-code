@@ -142,6 +142,13 @@ export interface Settings {
     timeout?: number;
     maxRetries?: number;
   };
+
+  // Telegram bot settings
+  telegram?: {
+    botToken?: string;
+    enabled?: boolean;
+    allowedUserIds?: string[];
+  };
 }
 
 export interface SettingsError {
